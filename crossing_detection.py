@@ -6,6 +6,10 @@ from numpy import expand_dims
 import datetime
 from PIL import Image
 from numpy import asarray
+import requests
+
+url = "https://kairosapi-karios-v1.p.rapidapi.com/detect"
+
 
 
 # Grabing the camera
@@ -24,6 +28,10 @@ temp = datetime.datetime.now()
 
 count = 0
 
+from keras_vggface.vggface import VGGFace
+# create a vggface2 model
+model = VGGFace(model='resnet50')
+        
 # start camera loop
 while(True):
     ret, frame = cap.read()
@@ -105,7 +113,37 @@ while(True):
         if (nose[0] <= int(width/2) + px_tol and nose[0] >= int(width/2) - px_tol and (dateTimeDifference.total_seconds() > sec_tol)):
             count+= 1
             temp = datetime.datetime.now()
+            cv2.imwrite("frame%d.jpg" % count, frame)
+        points = [left_eye, right_eye, mouth_left, mouth_right, nose]
+        dists = []
+        #(left_eye[1] - right_eye[1])**2 + left_eye[1] - 
 
+        
+
+        # para x
+
+        x_total = 0
+        y_total = 0
+        for point in points:
+            x_1 = point[0]
+            y_1 = point[1]
+            for other in points:
+                x_2 = other[0]
+                x_total += (x_1-x_2)**2
+                y_2 = other[1]
+                y_total += (y_1-y_2)**2
+            print("-"*10)
+            print("\n"*2)
+            print("X_total ", np.sqrt(x_total))
+            print("Y_total ", np.sqrt(y_total))
+            print("Distância Euclidiana ", np.sqrt(y_total) + np.sqrt(x_total))
+
+        
+        # example of creating a face embedding
+        # summarize input and output shape
+        
+        #payload = "{    \"image\":\""+frame+"\",    \"selector\":\"ROLL\"}"
+                
     # displaying the image
 
     cv2.imshow('frame',frame)
